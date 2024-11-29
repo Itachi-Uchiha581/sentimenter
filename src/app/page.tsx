@@ -1,101 +1,86 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useTransition } from 'react';
+import { analyze } from './actions/analyzer';
+import { LucideGithub } from 'lucide-react'; // Add this import
+
+export default function Sentimenter() {
+  const [url, setUrl] = useState('');
+  const [sentimentScore, setSentimentScore] = useState<number | undefined | null>(null);
+  const [sentimentLabel, setSentimentLabel] = useState<string | undefined | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = async () => {
+    setError(null);
+
+    if (!url) {
+      setError('Please enter a URL.');
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        const data = await analyze(url);
+        setSentimentScore(data?.sentiment.document.score);
+        setSentimentLabel(data?.sentiment.document.label);
+      } catch (err: any) {
+        setError(err.message || 'An error occurred.');
+      }
+    });
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4 relative">
+      <div className="max-w-md w-full bg-white shadow-md rounded-lg p-6">
+        <h1 className="text-2xl font-bold text-center mb-4 text-black">Sentimenter</h1>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="url" className="block text-sm font-medium text-gray-700">
+              Enter URL
+            </label>
+            <input
+              id="url"
+              type="url"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-600"
+              placeholder="https://example.com"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={isPending}
+            className={`w-full py-2 px-4 rounded-md text-white ${
+              isPending ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
           >
-            Read our docs
-          </a>
+            {isPending ? 'Analyzing...' : 'Submit'}
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        {error && <p className="mt-4 text-red-600 text-sm">{error}</p>}
+        {sentimentScore !== null && sentimentLabel !== null && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-md shadow-sm">
+            <p className="text-sm text-gray-600">
+              <strong>Sentiment Score:</strong> {sentimentScore}
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Label:</strong> {sentimentLabel}
+            </p>
+          </div>
+        )}
+      </div>
+      
+      {/* Made By Adeeb block */}
+      <a
+        href="https://github.com/Itachi-Uchiha581"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-4 left-4 flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition-colors"
+      >
+        <LucideGithub size={20} />
+        <span className="text-sm font-medium">Made by Adeeb</span>
+      </a>
     </div>
   );
 }
