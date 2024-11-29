@@ -20,7 +20,7 @@ type ApiResponse = {
 type RequestPayload = {
   url: string;
   features: {
-    sentiment: {};
+    sentiment: object;
   };
 };
 
