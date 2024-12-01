@@ -13,6 +13,8 @@ export default function Sentimenter() {
 
   const handleSubmit = async () => {
     setError(null);
+    setSentimentScore(null);
+    setSentimentLabel(null);
 
     if (!url) {
       setError('Please enter a URL.');
@@ -22,18 +24,15 @@ export default function Sentimenter() {
     startTransition(async () => {
       try {
         const data = await analyze(url);
-        if (data) {
+        if (data?.sentiment?.document) {
           setSentimentScore(data.sentiment.document.score);
           setSentimentLabel(data.sentiment.document.label);
         } else {
           setError('Could not analyze the webpage.');
         }
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An error occurred.');
-        }
+        console.error('Analysis failed:', err);
+        setError('Could not analyze the webpage.');
       }
     });
   };
