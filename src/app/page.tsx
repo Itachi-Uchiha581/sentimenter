@@ -22,8 +22,12 @@ export default function Sentimenter() {
     startTransition(async () => {
       try {
         const data = await analyze(url);
-        setSentimentScore(data?.sentiment.document.score);
-        setSentimentLabel(data?.sentiment.document.label);
+        if (data) {
+          setSentimentScore(data.sentiment.document.score);
+          setSentimentLabel(data.sentiment.document.label);
+        } else {
+          setError('Could not analyze the webpage.');
+        }
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);

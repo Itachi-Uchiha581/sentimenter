@@ -47,12 +47,17 @@ export async function analyze(url: string) {
         });
 
         if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+            if (response.status === 400) {
+                throw new Error('Could not analyze the webpage.');
+            } else {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
         }
 
         const data: ApiResponse = await response.json();
-        return data
+        return data;
     } catch (error) {
         console.error("Error:", error);
+        throw error;
     }
 }
