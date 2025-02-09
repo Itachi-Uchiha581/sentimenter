@@ -40,7 +40,7 @@ export default function Sentimenter() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4 relative">
       <div className="max-w-md w-full bg-white shadow-md rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-center mb-4 text-black">Sentimenter</h1>
+        <h1 className="text-2xl font-bold text-center mb-4 text-black">Gemstone Sentiment Analysis</h1>
         <div className="space-y-4">
           <div>
             <label htmlFor="url" className="block text-sm font-medium text-gray-700">
