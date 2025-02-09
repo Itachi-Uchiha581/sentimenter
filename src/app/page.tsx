@@ -95,7 +95,7 @@ export default function Sentimenter() {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-blue-700 font-medium">Sentiment Score</p>
-                <p className="text-2xl font-bold text-blue-900">{sentimentScore.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-blue-900">{typeof sentimentScore === 'number' ? sentimentScore.toFixed(2) : ''}</p>
               </div>
               <div>
                 <p className="text-sm text-blue-700 font-medium">Sentiment Label</p>
